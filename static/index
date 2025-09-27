@@ -1,0 +1,94 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Q&A</title>
+    <style>
+        body { font-family: sans-serif; margin: 2em; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .section { margin-bottom: 2em; padding: 1em; border: 1px solid #ccc; border-radius: 5px; }
+        #answer { white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PDF Q&A with Ollama</h1>
+        
+        <div class="section">
+            <h2>1. Upload PDF</h2>
+            <form id="upload-form">
+                <input type="file" id="pdf-file" name="file" accept=".pdf" required>
+                <button type="submit">Upload</button>
+            </form>
+            <p id="upload-status"></p>
+        </div>
+
+        <div class="section">
+            <h2>2. Ask a Question</h2>
+            <form id="query-form">
+                <input type="text" id="question" placeholder="Enter your question" style="width: 80%;" required>
+                <button type="submit">Ask</button>
+            </form>
+        </div>
+
+        <div class="section">
+            <h2>Answer</h2>
+            <p id="answer"></p>
+            <h3>Sources</h3>
+            <p id="sources"></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('upload-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const fileInput = document.getElementById('pdf-file');
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            const status = document.getElementById('upload-status');
+            status.textContent = 'Uploading...';
+
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                status.textContent = `Upload successful. ${result.chunks_added} chunks added.`;
+            } else {
+                status.textContent = 'Upload failed.';
+            }
+        });
+
+        document.getElementById('query-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const question = document.getElementById('question').value;
+            const answerEl = document.getElementById('answer');
+            const sourcesEl = document.getElementById('sources');
+
+            answerEl.textContent = 'Thinking...';
+            sourcesEl.textContent = '';
+
+            const formData = new FormData();
+            formData.append('question', question);
+
+            const response = await fetch('/query', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                answerEl.textContent = result.answer;
+                sourcesEl.textContent = 'Pages: ' + result.sources.join(', ');
+            } else {
+                answerEl.textContent = 'Error getting answer.';
+            }
+        });
+    </script>
+</body>
+</html>
