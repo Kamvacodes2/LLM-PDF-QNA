@@ -32,3 +32,33 @@ It combines:
 ---
 
 ## 📂 Project Structure
+pdf-qna/
+│── main.py # FastAPI entry point
+│── requirements.txt # Dependencies
+│── utils/ # Helper functions (OCR, embeddings, etc.)
+│── data/ # Sample PDFs
+
+
+---
+
+## ▶️ Getting Started
+
+### 1. Clone the repository
+```bash
+git clone 
+cd pdf-qna
+
+2. Create & activate virtual environment (recommended)
+python -m venv venv
+source venv/bin/activate    # Mac/Linux
+venv\Scripts\activate       # Windows
+
+3. Install dependencies
+pip install -r requirements.txt
+
+4. Run the app
+uvicorn main:app --reload
+
+5. Open in browser
+
+Go to: http://127.0.0.1:8000/docs
